@@ -14,10 +14,21 @@
     <script type="text/javascript" src="/etc/js/swfobject.js"></script>    
 	
 	<title>Komelgman: nd2d animated screen demo</title>
+	
+	<script type="text/javascript">
+
+		var flashvars = {};
+		var params = {};
+		var attributes = {};
+
+		swfobject.embedSWF("_Main.swf", "demo", "800", "600", "11.0.0", "/etc/expressInstall.swf", flashvars, params, attributes);
+
+	</script>	
 </head>
 <body>
 	<h1>Komelgman: nd2d animated screen demo</h1><br/>
 	<h3>Click space</h3>
-
+	
+	<div id="demo"></div>
 </body>
 </html>
