@@ -1,0 +1,82 @@
+<html>
+  <head>
+    <title>CodeCheck® Tracer</title> 
+    <meta charset='utf-8'/> 
+    <script charset='utf-8' src='https://horstmann.com/codecheck/script/Gettext.js' type='text/javascript'></script> 
+    <link href='https://horstmann.com/codecheck/css/codecheck_tracer.css' rel='stylesheet' type='text/css'/> 
+    <script src='https://horstmann.com/script/penpal.min.js'></script> 
+    <script>//<![CDATA[
+        let doneLoading = false
+        let getParent = () => {
+            if (!this.connection) {
+                this.connection = Penpal.connectToParent()
+            }
+
+            return this.connection.promise
+        }
+
+        let loaded = async () => {
+            if (window.self === window.top) return;
+            if (doneLoading) return
+            const parent = await getParent()
+            if (!doneLoading) {
+                parent.doneLoading()
+                doneLoading = true
+            }
+        }
+// ]]>
+    </script>
+    <script>//<![CDATA[
+if (!('horstmann_config' in window)) window.horstmann_config = {}
+horstmann_config.score_change_listener = async (element, state, score) => {
+  if (window.self === window.top) return
+  const parent = await getParent()
+  parent.submit(score, state)
+}
+horstmann_config.retrieve_state = async (element, callback) => {
+  if (window.self === window.top) { callback(element, undefined) ; return }
+
+  await loaded()
+  const parent = await getParent()
+  let state = await parent.getState()
+  if (state === null) state = undefined
+  callback(element, state)
+}
+
+let docHeight = 0
+const MIN_WIDTH = 950
+
+let sendDocHeight = () => {
+  if (window.self === window.top) return
+  window.scrollTo(0, 0)
+  const SEND_DOCHEIGHT_DELAY = 100
+  setTimeout(async () => {
+    const container = // document.body
+      document.getElementsByClassName('hc-included')[0]
+    let newDocHeight = container.scrollHeight + container.offsetTop
+    if (docHeight != newDocHeight) {
+      docHeight = newDocHeight
+      const parent = await getParent()
+      const docWidth = Math.max(MIN_WIDTH, container.scrollWidth + container.offsetLeft)
+      console.log("parent.resize", { docHeight, docWidth })
+      parent.resize(docHeight, docWidth)
+    }
+  }, SEND_DOCHEIGHT_DELAY)
+}
+
+window.addEventListener('load', () => {
+  const mutationObserver = new MutationObserver(sendDocHeight)
+  mutationObserver.observe(document.body, { childList: true, subtree: true })
+})
+// ]]>
+    </script> 
+  </head> 
+  <body>
+  <div class='hc-included'>
+<div>Trace through the following code snippet that demonstrates how to swap the values of two variables.</div>
+    <div class='codecheck_tracer'>
+      <script type='module' src='tracer.js'></script> 
+    </div>
+  </div>
+  </body> 
+</html>
